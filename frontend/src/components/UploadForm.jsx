@@ -1,90 +1,69 @@
-// Inside UploadForm.jsx
 import React, { useState } from 'react';
-import axios from 'axios';
 
-const UploadForm = () => {
-  const [file, setFile] = useState(null);
-  const [hands, setHands] = useState([]);
-  
-  const handleFileChange = (e) => {
-    setFile(e.target.files[0]);
-  };
+function UploadForm() {
+    const [playerStats, setPlayerStats] = useState([]);
+    const [error, setError] = useState(null);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!file) {
-      alert("Please select a file first!");
-      return;
-    }
+    const handleFileUpload = async (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
 
-    const formData = new FormData();
-    formData.append("file", file);
+        const formData = new FormData();
+        formData.append('file', file);
 
-    try {
-      const response = await axios.post("http://localhost:5000/upload", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+        try {
+            const response = await fetch('http://127.0.0.1:5000/upload', {
+                method: 'POST',
+                body: formData,
+            });
 
-      console.log("Response from backend:", response.data);
-      setHands(response.data.hands); // Save the parsed hands to state
-      alert("Upload successful! Check console for details.");
-    } catch (err) {
-      console.error("Error uploading file:", err);
-      alert("Error uploading file. Check console for details.");
-    }
-  };
+            if (!response.ok) {
+                throw new Error(`Server Error: ${response.statusText}`);
+            }
 
-  return (
-    <div>
-      <h2>Upload Poker Log</h2>
-      <form onSubmit={handleSubmit}>
-        <input type="file" onChange={handleFileChange} />
-        <button type="submit">Upload</button>
-      </form>
+            const data = await response.json();
+            if (data.error) {
+                throw new Error(data.error);
+            }
 
-      {hands.length > 0 && (
+            setPlayerStats(Object.values(data));
+        } catch (err) {
+            setError(err.message);
+        }
+    };
+
+    return (
         <div>
-          <h3>Hands Details</h3>
-          <table>
-            <thead>
-              <tr>
-                <th>Hand ID</th>
-                <th>Players</th>
-                <th>Actions</th>
-                <th>Winner</th>
-                <th>Pot</th>
-              </tr>
-            </thead>
-            <tbody>
-              {hands.map((hand, index) => (
-                <tr key={index}>
-                  <td>{hand.hand_id}</td>
-                  <td>
-                    {hand.players.map((player) => (
-                      <div key={player.name}>
-                        {player.name} (Chips: {player.chips})
-                      </div>
-                    ))}
-                  </td>
-                  <td>
-                    {hand.actions.map((action, idx) => (
-                      <div key={idx}>
-                        {action.player}: {action.action} {action.amount ? `Amount: ${action.amount}` : ""}
-                      </div>
-                    ))}
-                  </td>
-                  <td>{hand.winner}</td>
-                  <td>{hand.pot}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+            <input type="file" accept="application/json" onChange={handleFileUpload} />
+            {error && <div style={{ color: 'red' }}>{error}</div>}
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', marginTop: '20px' }}>
+                {playerStats.map((stats, index) => (
+                    <div
+                        key={index}
+                        style={{
+                            border: '1px solid #ccc',
+                            borderRadius: '8px',
+                            padding: '10px',
+                            background: 'white',
+                            width: '300px',
+                            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+                        }}
+                    >
+                        <h3 style={{ textAlign: 'center' }}>{stats.name}</h3>
+                        <ul style={{ listStyle: 'none', padding: '0' }}>
+                            <li>Hands Played: {stats.hands_played}</li>
+                            <li>VPIP: {stats.vpip_percentage.toFixed(2)}%</li>
+                            <li>Limp Percentage: {stats.limp_percentage.toFixed(2)}%</li>
+                            <li>PFR Percentage: {stats.pfr_precentage.toFixed(2)}%</li>
+                            <li>3bet Percentage: {stats.three_bet_percentage.toFixed(2)}%</li>
+                            <li>Aggression Factor: {stats.aggression_factor.toFixed(2)}</li>
+                            <li>Pots Won: {stats.pots_won}</li>
+                        </ul>
+                    </div>
+                ))}
+            </div>
         </div>
-      )}
-    </div>
-  );
-};
+    );
+}
 
 export default UploadForm;

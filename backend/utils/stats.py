@@ -124,7 +124,8 @@ def calculate_player_stats(file_path):
 
 
 # Example Usage
-file_path = r"C:\Users\steph\OneDrive\Desktop\data\poker-now-hands-game-pglT6LMW0tP4tv_bBO9wwmIet.json"  # Replace with your JSON file path
+#file_path = r"C:\Users\steph\OneDrive\Desktop\data\poker-now-hands-game-pglT6LMW0tP4tv_bBO9wwmIet.json"  # Replace with your JSON file path
+file_path = r"C:\Users\steph\Downloads\poker-now-hands-game-pglaiAy4PX1Yv7lat4HKJlNCB.json"
 stats = calculate_player_stats(file_path)
 
 # Display stats
