@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-function UploadForm() {
+function UploadForm({ updatePlayerStats, fetchFiles }) {
     const [playerStats, setPlayerStats] = useState([]);
     const [error, setError] = useState(null);
 
@@ -26,7 +26,11 @@ function UploadForm() {
                 throw new Error(data.error);
             }
 
-            setPlayerStats(Object.values(data));
+            // setPlayerStats(Object.values(data));
+            // Pass the player stats to the parent component (App.js)
+            updatePlayerStats(Object.values(data));
+            // Call fetchFiles to update the file list after a new file is uploaded
+            fetchFiles();
         } catch (err) {
             setError(err.message);
         }
@@ -36,7 +40,7 @@ function UploadForm() {
         <div>
             <input type="file" accept="application/json" onChange={handleFileUpload} />
             {error && <div style={{ color: 'red' }}>{error}</div>}
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', marginTop: '20px' }}>
+            {/* <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', marginTop: '20px' }}>
                 {playerStats.map((stats, index) => (
                     <div
                         key={index}
@@ -61,7 +65,7 @@ function UploadForm() {
                         </ul>
                     </div>
                 ))}
-            </div>
+            </div> */}
         </div>
     );
 }
