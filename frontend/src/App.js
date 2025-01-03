@@ -16,13 +16,7 @@ function App() {
                 return response.json();
             })
             .then((text) => {
-                try {
-                    console.log('Fetched files:', text); // Check if data is being fetched correctly
-                    setUploadedFiles(text);
-                } catch (error) {
-                    console.error('Error parsing JSON:', error);
-                    console.error('Response text:', text); // Log the response text
-                }
+                setUploadedFiles(text);
             })
             .catch((error) => {
                 console.error('Error fetching files:', error);
